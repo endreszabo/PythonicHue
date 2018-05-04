@@ -87,9 +87,12 @@ class Bridge:
                     self.create_object(objtype, obj)#light)
                 obj.hue_id=self.object_groups['actual'].objects_by_name[objtype][obj.kwargs['name']].hue_id
                 obj.hue_id=self.object_groups['actual'].objects_by_name[objtype][obj.kwargs['name']].hue_id
+    def create_light(light_wanted=None):
+        return None
     def create_object(self, objtype, obj):
         print(objtype, obj)
-        print(repr(light))
+        if objtype=='light':
+            self.create_lights(obj)
         return None
     def add_light(self, light):
         self.add_normalize('light', light)

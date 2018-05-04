@@ -29,7 +29,8 @@ class Group(GeneralHueObject):
     pass
 
 class Light(GeneralHueObject):
-    def attr_filter(self):
-        self.rw_attributes=['name','serial']
-        self.ro_attributes=[]
+    #def attr_filter(self):
+    #    self.rw_attributes.append('serial')
+    def to_python(self, objtype):
+        return super(Light, self).to_python(objtype, suffix=["\t## 6-characters serial number printed on light (optional)","\tserial = None"])
     pass

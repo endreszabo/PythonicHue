@@ -67,7 +67,7 @@ class ObjectGroup:
         if hue_id in self.objects_by_hue_id[obj]:
             return self.objects_by_hue_id[obj][hue_id]
         return None
-    def to_python(self):
+    def to_python(self, prefix=[], suffix=[]):
         s=[]
         for obj in self.objects:
             s+=[
@@ -76,9 +76,12 @@ class ObjectGroup:
                 '#'*(len(obj)+12),
                 ''
             ]
+            #s+=prefix
             for item in self.objects[obj]:
                 s+=item.to_python(obj)
                 s.append('')
+        #if suffix:
+        #    s+=suffix
         return s
 
 ##        for light in self.objects['light']:
@@ -190,16 +193,18 @@ class GeneralHueObject:
                 action=unit.render_action(addrparts[5:], action)
     def render_action(self, addrparts, action):
         return {'foo':'bar'}
-    def to_python(self, objtype):
+    def to_python(self, objtype, prefix=[], suffix=[]):
         if self.resolve_hue_id_fields:
             for field in self.resolve_hue_id_fields:
                 for i in range(len(self.kwargs[field[0]])):
                     self.kwargs[field[0]][i]=self.bridge.generate_object_reference_by_id(field[1], i, field[2])
-        s=['bridge.add_%s(%s(' % (objtype, self.__class__.__name__),
-            '\t## Read-write attributes']
+        s=['bridge.add_%s(%s(' % (objtype, self.__class__.__name__)]
+        s+=prefix
+        s.append('\t## Read-write attributes')
         s+=['\t{0}={1!r},'.format(k, v) for k, v in self.kwargs.items()]
         s.append('\t## Read-only attributes')
         s+=['\t{0}={1!r},'.format(k, v) for k, v in self.rokwargs.items()]
+        s+=suffix
         s.append('))')
         return s
     def get_name(self):
