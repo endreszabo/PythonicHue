@@ -55,7 +55,7 @@ class ObjectGroup:
     def get_schedules(self):
         return repr(self.schedules)
     def get_object_by_id(self, obj, hue_id):
-        return self.objects[obj][hue_id]
+        return self.objects_by_hue_id[obj][hue_id]
     def get_object_by_hue_id(self, obj, hue_id):
         #return list(filter(lambda x: x.kwargs['hue_id']==hue_id, self.objects[obj]))
 #        matched_object_key=list(
@@ -197,7 +197,7 @@ class GeneralHueObject:
         if self.resolve_hue_id_fields:
             for field in self.resolve_hue_id_fields:
                 for i in range(len(self.kwargs[field[0]])):
-                    self.kwargs[field[0]][i]=self.bridge.generate_object_reference_by_id(field[1], i, field[2])
+                    self.kwargs[field[0]][i]=self.bridge.generate_object_reference_by_id(field[1], self.kwargs[field[0]][i], field[2])
         s=['bridge.add_%s(%s(' % (objtype, self.__class__.__name__)]
         s+=prefix
         s.append('\t## Read-write attributes')

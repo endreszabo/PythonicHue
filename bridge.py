@@ -127,7 +127,7 @@ class Bridge:
         return self.object_groups['actual'].get_object_by_hue_id(obj, hue_id)
     def generate_object_reference_by_id(self, obj, hue_id, bridge_reference=True):
         if bridge_reference:
-            return 'bridge.get_%s("%s")' % (obj, self.actual.get_object_by_id(obj, hue_id).kwargs['name'])
+            return 'bridge.get_%s("%s")' % (obj, self.object_groups['actual'].get_object_by_id(obj, hue_id).kwargs['name'])
         return '"%s"' % (self.object_groups['actual'].get_object_by_id(obj, hue_id).kwargs['name'])
     def to_python(self):
         s=['bridge = %s(' % self.__class__.__name__,
