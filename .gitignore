@@ -1,6 +1,11 @@
 qhue/
 __pycache__/
+*.py[cod]
+*$py.class
+
 config.py
+
+#my stuff
 hue-hubud1-*
 
 

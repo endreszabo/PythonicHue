@@ -88,7 +88,7 @@ class Bridge:
                 obj.hue_id=self.object_groups['actual'].objects_by_name[objtype][obj.kwargs['name']].hue_id
                 obj.hue_id=self.object_groups['actual'].objects_by_name[objtype][obj.kwargs['name']].hue_id
     def create_light(light_wanted=None):
-        return None
+        raise NotImplementedError
     def create_object(self, objtype, obj):
         print(objtype, obj)
         if objtype=='light':

@@ -1,0 +1,5 @@
+
+bridges=[
+    {'api_key': '-pHOlU-BVAKbYTbsyjjPdDBtQEJiqcP8pspmf1Yl', 'ipaddress': '44.128.7.180'},
+    {'api_key': 'CFGGnjZ8RXt7XPHlafpD-VDjed83SiqsccVgtqAp', 'ipaddress': '44.128.7.181'}
+]
