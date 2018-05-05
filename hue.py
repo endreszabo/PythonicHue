@@ -20,8 +20,8 @@ class Scene(GeneralHueObject):
         ]
     def fill_rw(self, **kwargs):
         super(self.__class__, self).fill_rw(**kwargs)
+		# known API quirk: get per scene lightstates attribute that was not received when asked for all the scenes
         self.kwargs['lightstates']=self.bridge.qhue.scenes[self.hue_id]()['lightstates']
-        #self.kwargs['lights']=ObjectList(self.kwargs['lights'])
 
 class Sensor(GeneralHueObject):
     def attr_filter(self):
