@@ -64,6 +64,10 @@ class Bridge:
         for schedule in jsonschedules:
             foo=jsonschedules[schedule]
             self.add_schedule(Schedule(self, schedule, **foo))
+        jsonscenes=self.raw_get_scenes()
+        for scene in jsonscenes:
+            foo=jsonscenes[scene]
+            self.add_scene(Scene(self, scene, **foo))
     def raw_get_lights(self):
         return self.qhue.lights()
     def raw_get_groups(self):
@@ -74,6 +78,8 @@ class Bridge:
         return self.qhue.config()
     def raw_get_schedules(self):
         return self.qhue.schedules()
+    def raw_get_scenes(self):
+        return self.qhue.scenes()
     def add_actual(self, objtype, obj):
         return self.current_object_group.add_object(objtype, obj)
     def add_desured(self, objtype, obj):
@@ -81,7 +87,7 @@ class Bridge:
     def add_normalize(self, objtype, obj):
         if not obj.hue_id:
             if not obj.name not in self.object_groups['actual'].objects_by_name:
-                raise NotImplementedError('Object not found in bridge, must add')
+                crate_object(objtype, obj)
             else:
                 if obj.kwargs['name'] not in self.object_groups['actual'].objects_by_name[objtype]:
                     self.create_object(objtype, obj)#light)
@@ -93,7 +99,7 @@ class Bridge:
         print(objtype, obj)
         if objtype=='light':
             self.create_lights(obj)
-        return None
+        raise NotImplementedError('Object creation of type %s not yet supported' % objtype)
     def add_light(self, light):
         self.add_normalize('light', light)
         print ('target og: ',self.current_object_group)
@@ -109,6 +115,10 @@ class Bridge:
     def add_schedule(self, schedule):
         self.add_normalize('schedule', schedule)
         return self.object_groups[self.current_object_group].add_object('schedule',schedule)
+    def add_scene(self, scene):
+        self.add_normalize('scene', scene)
+        print ('target og: ',self.current_object_group)
+        return self.object_groups[self.current_object_group].add_object('scene',scene)
     def lights(self):
         return self.actual.get_lights()
     def groups(self):
@@ -127,8 +137,8 @@ class Bridge:
         return self.object_groups['actual'].get_object_by_hue_id(obj, hue_id)
     def generate_object_reference_by_id(self, obj, hue_id, bridge_reference=True):
         if bridge_reference:
-            return 'bridge.get_%s("%s")' % (obj, self.object_groups['actual'].get_object_by_id(obj, hue_id).kwargs['name'])
-        return '"%s"' % (self.object_groups['actual'].get_object_by_id(obj, hue_id).kwargs['name'])
+            return 'bridge.get_%s("%s")' % (obj, self.actual.get_object_by_id(obj, hue_id).kwargs['name'])
+        return '%s' % (self.object_groups['actual'].get_object_by_id(obj, hue_id).kwargs['name'])
     def to_python(self):
         s=['bridge = %s(' % self.__class__.__name__,
             '\tapi_key="%s",' % self.api_key,

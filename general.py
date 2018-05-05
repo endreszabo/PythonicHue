@@ -13,7 +13,6 @@ class ObjectList(list):
     def __repr__(self):
         return("[\n\t\t"+',\n\t\t'.join([str(x) for x in self])+"\n\t]")
 
-
 class ObjectGroup:
     def __init__(self,bridge=None,name='(no name)'):
         self.objects=dict()
@@ -21,7 +20,7 @@ class ObjectGroup:
         self.objects_by_hue_id=dict()
         self.bridge=bridge
         self.name=name
-        for objtype in ['light', 'group', 'sensor', 'schedule']:
+        for objtype in ['light', 'group', 'sensor', 'schedule', 'scene']:
             self.objects[objtype]=list()
             self.objects_by_name[objtype]=dict()
             self.objects_by_hue_id[objtype]=dict()
@@ -30,6 +29,8 @@ class ObjectGroup:
         #    self.objects[objtype]=list()
         #    self.objects_by_name[objtype]=dict()
         #    self.objects_by_hue_id[objtype]=dict()
+        if objtype not in self.objects:
+            raise ValueError('Object class "%s" storage not defined in ObjectGroup' % objtype)
         self.objects[objtype].append(obj)
         if obj.hue_id:
             print('og name %s adding obytype %s with id %s' % (self.name, objtype, obj.hue_id))
@@ -194,10 +195,19 @@ class GeneralHueObject:
     def render_action(self, addrparts, action):
         return {'foo':'bar'}
     def to_python(self, objtype, prefix=[], suffix=[]):
+        print(self.__class__.__name__,repr(self.kwargs))
         if self.resolve_hue_id_fields:
             for field in self.resolve_hue_id_fields:
-                for i in range(len(self.kwargs[field[0]])):
-                    self.kwargs[field[0]][i]=self.bridge.generate_object_reference_by_id(field[1], self.kwargs[field[0]][i], field[2])
+                print("Type of field",type(self.kwargs[field[0]]))
+                if type(self.kwargs[field[0]]) == list:
+                    for i in range(len(self.kwargs[field[0]])):
+                        self.kwargs[field[0]][i]=self.bridge.generate_object_reference_by_id(field[1], self.kwargs[field[0]][i], field[2])
+                elif type(self.kwargs[field[0]]) == dict:
+                    the_dict=self.kwargs[field[0]]
+                    for i in list(the_dict.keys()):
+                        the_dict[self.bridge.generate_object_reference_by_id(field[1], i, field[2])]=the_dict[i]
+                        the_dict.pop(i)
+                    #raise NotImplementedError('Dict reference generation not supported')
         s=['bridge.add_%s(%s(' % (objtype, self.__class__.__name__)]
         s+=prefix
         s.append('\t## Read-write attributes')

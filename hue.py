@@ -9,6 +9,20 @@ class Schedule(GeneralHueObject):
             #self.kwargs['command']['XXX']=122
             self.kwargs['command']=self.action(self.kwargs['command'])
 
+class Scene(GeneralHueObject):
+    def attr_filter(self):
+        self.rw_attributes=['name','description','command','localtime','status','autodelete']
+        self.rw_attributes=['name','lights','recycle', 'locked','appdata', 'picture', 'lightstates']
+        self.ro_attributes=[]
+        self.resolve_hue_id_fields=[
+            ('lights','light', False),
+            ('lightstates','light', False)
+        ]
+    def fill_rw(self, **kwargs):
+        super(self.__class__, self).fill_rw(**kwargs)
+        self.kwargs['lightstates']=self.bridge.qhue.scenes[self.hue_id]()['lightstates']
+        #self.kwargs['lights']=ObjectList(self.kwargs['lights'])
+
 class Sensor(GeneralHueObject):
     def attr_filter(self):
         self.rw_attributes=['name','config','recycle']
@@ -25,7 +39,7 @@ class Group(GeneralHueObject):
     def fill_rw(self, **kwargs):
         super(Group, self).fill_rw(**kwargs)
         lights=self.kwargs['lights']
-        self.kwargs['lights']=ObjectList(self.kwargs['lights'])
+        #"self.kwargs['lights']=ObjectList(self.kwargs['lights'])
     pass
 
 class Light(GeneralHueObject):
