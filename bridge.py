@@ -36,13 +36,8 @@ class Bridge:
         print('would change:', body)
         pass
     def commit(self):
-        print(2)
-        print('actual has:', repr([[x, id(x)] for x in self.object_groups['actual'].objects_by_hue_id['light']]))
-        print('desired has:', repr([[x, id(x)] for x in self.object_groups['desired'].objects_by_hue_id['light']]))
-        print('desired has: ', repr(self.object_groups['desired'].objects))
         #self.object_groups['actual'].diff(self.object_groups['desired'])
         self.object_groups['desired'].diff(self.object_groups['actual'])
-        print(3)
     def populate_actual(self):
         jsonlights=self.raw_get_lights()
         for light in jsonlights:
@@ -51,7 +46,6 @@ class Bridge:
             #self.add_actual('lights',Light(self, light, **foo))
             #self.actual.add_light(light, Light(self, light, **foo))
             self.add_light(Light(self, light, **foo))
-        #print(self.lights())
         jsongroups=self.raw_get_groups()
         for group in jsongroups:
             foo=jsongroups[group]
@@ -102,32 +96,26 @@ class Bridge:
     def create_light(light_wanted=None):
         raise NotImplementedError
     def create_object(self, objtype, obj):
-        print(objtype, obj)
         if objtype=='light':
             self.create_lights(obj)
         raise NotImplementedError('Object creation of type %s not yet supported' % objtype)
     def add_light(self, light):
         self.add_normalize('light', light)
-        print ('target og: ',self.current_object_group)
         return self.object_groups[self.current_object_group].add_object('light',light)
     def add_group(self, group):
         self.add_normalize('group', group)
-        print ('target og: ',self.current_object_group)
         return self.object_groups[self.current_object_group].add_object('group',group)
     def add_sensor(self, sensor):
         self.add_normalize('sensor', sensor)
-        print ('target og: ',self.current_object_group)
         return self.object_groups[self.current_object_group].add_object('sensor',sensor)
     def add_schedule(self, schedule):
         self.add_normalize('schedule', schedule)
         return self.object_groups[self.current_object_group].add_object('schedule',schedule)
     def add_scene(self, scene):
         self.add_normalize('scene', scene)
-        print ('target og: ',self.current_object_group)
         return self.object_groups[self.current_object_group].add_object('scene',scene)
     def add_rule(self, rule):
         self.add_normalize('rule',rule)
-        print ('target og: ',self.current_object_group)
         return self.object_groups[self.current_object_group].add_object('rule',rule)
     def lights(self):
         return self.actual.get_lights()

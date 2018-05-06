@@ -33,7 +33,7 @@ class ObjectGroup:
             raise ValueError('Object class "%s" storage not defined in ObjectGroup' % objtype)
         self.objects[objtype].append(obj)
         if obj.hue_id:
-            print('og name %s adding obytype %s with id %s' % (self.name, objtype, obj.hue_id))
+            #print('og name %s adding obytype %s with id %s' % (self.name, objtype, obj.hue_id))
             self.objects_by_hue_id[objtype][obj.hue_id]=obj
         if 'name' in obj.kwargs:
             self.objects_by_name[objtype][obj.kwargs['name']]=obj
@@ -93,6 +93,7 @@ class ObjectGroup:
 ##                light.__repr__()
 ##            ))
     def diff(self, other):
+        # Huge hackery is imminent
         print('2 actual has:', repr(self.objects_by_hue_id))
         print('2 desired has: ', repr(other.objects_by_hue_id))
         print('3 actual has:', repr([[x, id(x)] for x in self.objects['light']]))
@@ -195,10 +196,9 @@ class GeneralHueObject:
     def render_action(self, addrparts, action):
         return {'foo':'bar'}
     def to_python(self, objtype, prefix=[], suffix=[]):
-        print(self.__class__.__name__,repr(self.kwargs))
+        #print(self.__class__.__name__,repr(self.kwargs))
         if self.resolve_hue_id_fields:
             for field in self.resolve_hue_id_fields:
-                print("Type of field",type(self.kwargs[field[0]]))
                 if type(self.kwargs[field[0]]) == list:
                     for i in range(len(self.kwargs[field[0]])):
                         self.kwargs[field[0]][i]=self.bridge.generate_object_reference_by_id(field[1], self.kwargs[field[0]][i], field[2])
