@@ -20,7 +20,7 @@ class ObjectGroup:
         self.objects_by_hue_id=dict()
         self.bridge=bridge
         self.name=name
-        for objtype in ['light', 'group', 'sensor', 'schedule', 'scene']:
+        for objtype in ['light', 'group', 'sensor', 'schedule', 'scene', 'rule']:
             self.objects[objtype]=list()
             self.objects_by_name[objtype]=dict()
             self.objects_by_hue_id[objtype]=dict()

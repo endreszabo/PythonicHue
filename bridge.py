@@ -59,7 +59,7 @@ class Bridge:
         jsonsensors=self.raw_get_sensors()
         for sensor in jsonsensors:
             foo=jsonsensors[sensor]
-            self.add_sensor(Sensor(self, sensor, **foo))
+            self.add_sensor(SensorFactory(self, sensor, **foo))
         jsonschedules=self.raw_get_schedules()
         for schedule in jsonschedules:
             foo=jsonschedules[schedule]
@@ -68,6 +68,10 @@ class Bridge:
         for scene in jsonscenes:
             foo=jsonscenes[scene]
             self.add_scene(Scene(self, scene, **foo))
+        jsonrules=self.raw_get_rules()
+        for rule in jsonrules:
+            foo=jsonrules[rule]
+            self.add_rule(Rule(self, rule, **foo))
     def raw_get_lights(self):
         return self.qhue.lights()
     def raw_get_groups(self):
@@ -80,6 +84,8 @@ class Bridge:
         return self.qhue.schedules()
     def raw_get_scenes(self):
         return self.qhue.scenes()
+    def raw_get_rules(self):
+        return self.qhue.rules()
     def add_actual(self, objtype, obj):
         return self.current_object_group.add_object(objtype, obj)
     def add_desured(self, objtype, obj):
@@ -119,6 +125,10 @@ class Bridge:
         self.add_normalize('scene', scene)
         print ('target og: ',self.current_object_group)
         return self.object_groups[self.current_object_group].add_object('scene',scene)
+    def add_rule(self, rule):
+        self.add_normalize('rule',rule)
+        print ('target og: ',self.current_object_group)
+        return self.object_groups[self.current_object_group].add_object('rule',rule)
     def lights(self):
         return self.actual.get_lights()
     def groups(self):
