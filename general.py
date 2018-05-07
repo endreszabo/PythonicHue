@@ -153,6 +153,7 @@ class GeneralHueObject:
 
     def __init__(self, bridge=None, hue_id=None, **kwargs):
         self.bridge=bridge
+        self._raw_attrs=kwargs
         self.kwargs=dict()
         self.rokwargs={}
         self.rw_attributes=['name']

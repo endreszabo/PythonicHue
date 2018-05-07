@@ -89,7 +89,7 @@ def SensorFactory(bridge, sensordata, **kwargs):
 
 class Sensor(GeneralHueObject):
     def attr_filter(self):
-        self.rw_attributes=['name','config','recycle']
+        self.rw_attributes=['name','recycle']
         self.ro_attributes=['type','modelid','manufacturername','uniqueid']
 
 # ZigBee native sensors
@@ -116,9 +116,11 @@ class Presence(Sensor): #ZLLPresence
 ZLLPresence=Presence
 
 class LightLevel(Sensor): #ZLLLightLevel
-    def attr_filter(self):
-        self.rw_attributes.append('tholddark')
-        self.rw_attributes.append('tholdoffset')
+    def fill_rw(self, **kwargs):
+        super(self.__class__, self).fill_rw(**kwargs)
+        for key in ['on','tholddark','tholdoffset','ledindication','usertest']:
+            self.kwargs[key]=self._raw_attrs['config'][key]
+            self.rw_attributes.append(key)
 ZLLLightLevel=LightLevel
 
 class Temperature(Sensor):
