@@ -62,7 +62,7 @@ def SensorFactory(bridge, sensordata, **kwargs):
     elif kwargs['type']=='ZGPSwitch':
         return Tap(bridge, sensordata, **kwargs)
     elif kwargs['type']=='ZLLPresence':
-        return Motion(bridge, sensordata, **kwargs)
+        return Presence(bridge, sensordata, **kwargs)
     elif kwargs['type']=='ZLLTemperature':
         return Temperature(bridge, sensordata, **kwargs)
     elif kwargs['type']=='ZLLLightLevel':
@@ -109,15 +109,11 @@ class Dimmer(Sensor): #ZLLSwitch
         self.buttonOff=DimmerButton()
 ZLLSwitch=Dimmer
 
-class Motion(Sensor): #ZLLPresence
+class Presence(Sensor): #ZLLPresence
     def attr_filter(self):
         self.rw_attributes.append('sensitivity')
         self.ro_attributes.append('sensitivitymax')
-        self.buttonOn=DimmerButton()
-        self.buttonDimUp=DimmerButton()
-        self.buttonDimDown=DimmerButton()
-        self.buttonOff=DimmerButton()
-ZLLPresence=Motion
+ZLLPresence=Presence
 
 class LightLevel(Sensor): #ZLLLightLevel
     def attr_filter(self):
