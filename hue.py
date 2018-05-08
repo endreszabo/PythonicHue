@@ -89,8 +89,8 @@ def SensorFactory(bridge, sensordata, **kwargs):
 
 class Sensor(GeneralHueObject):
     def attr_filter(self):
-        self.rw_attributes=['name','recycle']
-        self.ro_attributes=['type','modelid','manufacturername','uniqueid']
+        self.rw_attributes=['name']
+        self.ro_attributes=['uniqueid']
 
 # ZigBee native sensors
 class Tap(Sensor): #ZLLSwitch
@@ -110,9 +110,11 @@ class Dimmer(Sensor): #ZLLSwitch
 ZLLSwitch=Dimmer
 
 class Presence(Sensor): #ZLLPresence
-    def attr_filter(self):
-        self.rw_attributes.append('sensitivity')
-        self.ro_attributes.append('sensitivitymax')
+    def fill_rw(self, **kwargs):
+        super(self.__class__, self).fill_rw(**kwargs)
+        for key in ['sensitivity','ledindication','usertest']:
+            self.kwargs[key]=self._raw_attrs['config'][key]
+            self.rw_attributes.append(key)
 ZLLPresence=Presence
 
 class LightLevel(Sensor): #ZLLLightLevel
@@ -124,38 +126,52 @@ class LightLevel(Sensor): #ZLLLightLevel
 ZLLLightLevel=LightLevel
 
 class Temperature(Sensor):
+    def fill_rw(self, **kwargs):
+        super(self.__class__, self).fill_rw(**kwargs)
+        for key in ['ledindication','usertest']:
+            self.kwargs[key]=self._raw_attrs['config'][key]
+            self.rw_attributes.append(key)
     pass
+ZLLTemperature=Temperature
 
 # CLIP (IP) sensors
-class CLIPLightlevel(LightLevel):
+class IPSensor(Sensor):
+    """General IP Sensor for storing extra values"""
+    def attr_filter(self):
+        self.ro_attributes+=['modelid','manufacturername']
+
+class CLIPLightlevel(IPSensor):
     pass
 
-class CLIPGenericFlag(Sensor):
+class CLIPGenericFlag(IPSensor):
     pass
 
-class CLIPGenericStatus(Sensor):
+class CLIPGenericStatus(IPSensor):
     pass
 
-class CLIPSwitch(Sensor):
+class CLIPSwitch(IPSensor):
     pass
 
-class CLIPOpenClose(Sensor):
+class CLIPOpenClose(IPSensor):
     pass
 
-class CLIPPresence(Sensor):
+class CLIPPresence(IPSensor):
     pass
 
-class CLIPTemperature(Sensor):
+class CLIPTemperature(IPSensor):
     pass
 
-class CLIPHumidity(Sensor):
+class CLIPHumidity(IPSensor):
     pass
 
 #Pseudo sensors
 class Daylight(Sensor):
-    def attr_filter(self):
-        self.rw_attributes.append('lat')
-        self.rw_attributes.append('long')
-        self.rw_attributes.append('sunriseoffset')
-        self.rw_attributes.append('sunsetoffset')
- 
+    def fill_rw(self, **kwargs):
+        super(self.__class__, self).fill_rw(**kwargs)
+        for key in ['on','sunriseoffset','sunsetoffset']:
+            self.kwargs[key]=self._raw_attrs['config'][key]
+            self.rw_attributes.append(key)
+        for key in ['lat','long']:
+            self.kwargs[key]=''
+            self.rw_attributes.append(key)
+
