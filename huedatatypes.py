@@ -12,7 +12,7 @@ class HueASCIIString(HueString):
     def __init__(self, value, minlen, maxlen):
         super(HueString, self.__class__).__init__(self, value, minlen, maxlen)
         if (value[0]=='k'):
-            raise ValueError('k found')
+            raise ValueError(self.__class__.__name__)
         if (len(value)>16):
             raise ValueError('String allowed length exceeded')
 
@@ -51,7 +51,8 @@ class AttributeGroup:
 
 if __name__ == "__main__":
     a=AttributeGroup('read only stuffs', [
-        Attribute('foo',HueASCIIString('test value', 0, 16), helptext='hint for foo attribute'),
+        Attribute('foo',HueASCIIString('ktest value', 0, 16), helptext='hint for foo attribute'),
         Attribute('bar',HueASCIIString('test string', 0, 16), helptext='hint again, but now for bar attribute'),
-        ])
+        ]
+    )
     print(a.to_python())
