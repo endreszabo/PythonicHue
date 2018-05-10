@@ -1,3 +1,4 @@
+from huedatatypes import *
 
 def indenter(items, indent=1, char='\t', suffix=''):
     for i in range(len(items)):
@@ -12,6 +13,13 @@ def indenter(items, indent=1, char='\t', suffix=''):
 class ObjectList(list):
     def __repr__(self):
         return("[\n\t\t"+',\n\t\t'.join([str(x) for x in self])+"\n\t]")
+class MultiRowList(list):
+    def __repr__(self, indent=2):
+        return("[\n\t\t"+',\n\t\t'.join([repr(x) for x in self])+"\n\t]")
+        return("[\n"+("\t"*indent)+',\n'+("\t"*indent).join([repr(x) for x in self])+"\n\t]")
+        return(
+            "[\n"+("\t"*indent)+"+',\n"+("\t"*indent)
+        .join([repr(x) for x in self])+"\n"+("\t"*(indent-1))+"]")
 
 class ObjectGroup:
     def __init__(self,bridge=None,name='(no name)'):
@@ -158,6 +166,8 @@ class GeneralHueObject:
         self.rokwargs={}
         self.rw_attributes=['name']
         self.ro_attributes=['uniqueid']
+        self.rw_attrs=AttributeGroup('Read-write variables')
+        self.ro_attrs=AttributeGroup('Readonly variables (for pythonichue object reference, do not edit)')
         self.resolve_hue_id_fields=[]
         #kwargs=kwargs.copy()
         self.hue_id=hue_id
@@ -198,7 +208,7 @@ class GeneralHueObject:
         return {'foo':'bar'}
     def to_python(self, objtype, prefix=[], suffix=[]):
         #print(self.__class__.__name__,repr(self.kwargs))
-        if self.resolve_hue_id_fields:
+        if False:#self.resolve_hue_id_fields:
             for field in self.resolve_hue_id_fields:
                 if type(self.kwargs[field[0]]) == list:
                     for i in range(len(self.kwargs[field[0]])):
