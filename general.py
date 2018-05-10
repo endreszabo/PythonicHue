@@ -215,6 +215,10 @@ class GeneralHueObject:
         s+=['\t{0}={1!r},'.format(k, v) for k, v in self.kwargs.items()]
         s.append('\t## Read-only attributes')
         s+=['\t{0}={1!r},'.format(k, v) for k, v in self.rokwargs.items()]
+        if hasattr(self, 'rw_attrs'):
+            s+=self.rw_attrs.to_python()
+        if hasattr(self, 'ro_attrs'):
+            s+=self.ro_attrs.to_python()
         s+=suffix
         s.append('))')
         return s

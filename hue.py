@@ -1,5 +1,6 @@
 from general import GeneralHueObject, ObjectList
 from metaobjects import *
+from huedatatypes import *
 
 class Schedule(GeneralHueObject):
     def attr_filter(self):
@@ -91,6 +92,14 @@ class Sensor(GeneralHueObject):
     def attr_filter(self):
         self.rw_attributes=['name']
         self.ro_attributes=['uniqueid']
+    def fill_rw(self, **kwargs):
+        self.rw_attrs=AttributeGroup('Read-write variables', [
+            Attribute('name', HueString(kwargs['name'], 1, 32), helptext='The human readable name of the sensor. Is not allowed to be empty.'),
+        ])
+        if 'uniqueid' in kwargs:
+            self.ro_attrs=AttributeGroup('Readonly variables (for pythonichue object reference, do not edit)', [
+                Attribute('uniqueid', HueString(kwargs['uniqueid'], 6, 32), helptext='Unique id of the sensor. Should be the MAC address of the device.'),
+            ])
 
 # ZigBee native sensors
 class Tap(Sensor): #ZLLSwitch

@@ -46,7 +46,8 @@ class AttributeGroup:
         s=[("\t"*indent)+'## '+self.heading]
         for attribute in self.attributes:
             s.append(("\t"*indent)+str(attribute))
-        return "\n".join(s)
+        return s
+        #return "\n".join(s)
     pass
 
 if __name__ == "__main__":
