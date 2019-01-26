@@ -1,11 +1,13 @@
 class HueString(str):
     def __new__(cls, value, *args, **kwargs):
         return str.__new__(cls, value)
-    def __init__(self, value, minlen, maxlen):
-        if (len(value)>maxlen):
-            raise ValueError('String allowed length exceeded')
-        if (len(value)<minlen):
-            raise ValueError('String shorter than allowed')
+    def __init__(self, value, minlen=None, maxlen=None):
+        if type(maxlen) != type(None):
+            if (len(value)>maxlen):
+                raise ValueError('String allowed length exceeded')
+        if type(minlen) != type(None):
+            if (len(value)<minlen):
+                raise ValueError('String shorter than allowed')
 
 class HueInteger(int):
     def __new__(cls, value, *args, **kwargs):
@@ -25,8 +27,63 @@ class HueUInt16(HueInteger):
     #def __init__(self, value):
     #    super(HueInteger, self.__class__).__init__(self, value, 0, 2**16-1)
 
-HueBoolean=bool #one can not simply subclass 'bool'
+class HueLightstate():
+    pass
 
+class HueCommand():
+    def __init__(self, bridge, value):
+        #print('command:',repr(value))
+        self._address=value['address']
+        self._method=value['method']
+        self._body=value['body']
+        self.__addr_parts=self._address.split('/')
+        self.__sensor=bridge.get_object_by_hue_id('sensor',self.__addr_parts[4])
+        self._bridge=bridge
+        #print('sensor name', self.__sensor)
+        #print(self._body)
+        if 'status' in self._body:
+            self.command=self.__sensor.set_status(self._body['status'])
+            #print(self.command.to_python())
+        if 'flag' in self._body:
+            self.command=self.__sensor.set_flag(self._body['flag'])
+            #print(self.command.to_python())
+    def __to_rest__(self):
+        return Dict(
+            address='/api/%s/sensors/%d/state' % (self._bridge.apikey, self.__sensor.hue_id),
+        )
+
+    def __repr__(self):
+        return "self partial FIXME"
+        return self.command.to_python()
+
+class HueCommand2():
+    def __init__(self, bridge, value):
+        #print('command:',repr(value))
+        print(value)
+        self._address=value['address']
+        self._method=value['method']
+        self._body=value['body']
+        self.__addr_parts=self._address.split('/')
+        self.__sensor=bridge.get_object_by_hue_id(self.__addr_parts[1][:-1],self.__addr_parts[2])
+        self._bridge=bridge
+        #print('sensor name', self.__sensor)
+        #print(self._body)
+        print(self.__sensor)
+        if 'status' in self._body:
+            self.command=self.__sensor.set_status(self._body['status'])
+            #print(self.command.to_python())
+        if 'flag' in self._body:
+            self.command=self.__sensor.set_flag(self._body['flag'])
+            #print(self.command.to_python())
+    def __to_rest__(self):
+        return Dict(
+            address='/api/%s/sensors/%d/state' % (self._bridge.apikey, self.__sensor.hue_id),
+        )
+    def __repr__(self):
+        return "self partial FIXME"
+        return self.command.to_python()
+
+HueBoolean=bool #one can not simply subclass 'bool'
 
 class HueASCIIString(HueString):
     def __new__(cls, value, *args, **kwargs):
@@ -60,6 +117,8 @@ class Attribute:
         if(self.helptext):
             s+=' # '+self.helptext
         return s
+    def __repr__(self):
+        return repr(self.attribute)
     #@property
     #def name(self):
     #    return self.name
@@ -85,6 +144,8 @@ class AttributeGroup:
             return s
         return []
         #return "\n".join(s)
+    def __str__(self):
+        return "<%s with %d attributes>" % (self.__class__.__name__, len(self.attributes.keys()))
 
 if __name__ == "__main__":
     a=AttributeGroup('read only stuffs', [

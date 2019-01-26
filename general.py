@@ -21,6 +21,9 @@ class MultiRowList(list):
             "[\n"+("\t"*indent)+"+',\n"+("\t"*indent)
         .join([repr(x) for x in self])+"\n"+("\t"*(indent-1))+"]")
 
+def dict_to_call(value):
+    return(', '.join(['{}={!r}'.format(k, v) for k, v in value.items()]))
+
 class ObjectGroup:
     def __init__(self,bridge=None,name='(no name)'):
         self.objects=dict()
@@ -43,8 +46,9 @@ class ObjectGroup:
         if obj.hue_id:
             #print('og name %s adding obytype %s with id %s' % (self.name, objtype, obj.hue_id))
             self.objects_by_hue_id[objtype][obj.hue_id]=obj
-        if 'name' in obj.kwargs:
-            self.objects_by_name[objtype][obj.kwargs['name']]=obj
+        #FIXME
+        #if 'name' in obj.kwargs:
+        #    self.objects_by_name[objtype][obj.kwargs['name']]=obj
         #self.objects[obj.__class__.__name__.lower()][obj.hue_id]=obj
         return obj
     def add_light(self, hue_id, light):
@@ -55,6 +59,8 @@ class ObjectGroup:
         return self.add_object('sensor',sensor)
     def add_schedule(self, hue_id, schedule):
         return self.add_object('schedule',schedule)
+    def add_scene(self, hue_id, scene):
+        return self.add_object('scene',scene)
     def get_lights(self):
         return repr(self.objects['light'])
     def get_groups(self):
@@ -139,33 +145,44 @@ class GeneralHueObject:
         pass
 
     def fill_rw(self, **kwargs):
-        for attr in self.rw_attributes:
-            if type(attr) == tuple:
-                if attr[0] in kwargs:
-                    self.kwargs[attr[1]]=kwargs[attr[0]]
-            if attr in kwargs:
-                self.kwargs[attr]=kwargs[attr]
+        pass
+        ### to be removed
+        ###for attr in self.rw_attributes:
+        ###    if type(attr) == tuple:
+        ###        if attr[0] in kwargs:
+        ###            self.kwargs[attr[1]]=kwargs[attr[0]]
+        ###    if attr in kwargs:
+        ###        self.kwargs[attr]=kwargs[attr]
 
     def fill_ro(self, **kwargs):
-        for attr in self.ro_attributes:
-            if attr in kwargs:
-                self.rokwargs[attr]=kwargs[attr]
+        pass
+        ###for attr in self.ro_attributes:
+        ###    if attr in kwargs:
+        ###        self.rokwargs[attr]=kwargs[attr]
     def reference(self):
         return 'bridges["%s"].get_light_by_name("%s")' % (self.bridge.name, self.name())
 
-    def name(self):
-        return self.kwargs['name']
-        if self.kwargs.has_key('name'):
-            return self.kwargs['name']
-        return self.hue_id
+    #to be removed
+    #@property
+    #def name(self):
+    #    try:
+    #        return self.name
+    #    except AttributeError:
+    #        return self.hue_id
+        #to be removed
+        #return self.kwargs['name']
+        #if self.kwargs.has_key('name'):
+        #    return self.kwargs['name']
+        #return self.hue_id
 
     def __init__(self, bridge=None, hue_id=None, **kwargs):
         self.bridge=bridge
         self._raw_attrs=kwargs
-        self.kwargs=dict()
-        self.rokwargs={}
-        self.rw_attributes=['name']
-        self.ro_attributes=['uniqueid']
+        # To be removed
+        ###self.kwargs=dict()
+        ###self.rokwargs={}
+        ###self.rw_attributes=['name']
+        ###self.ro_attributes=['uniqueid']
         self.rw_attrs=AttributeGroup('Read-write variables')
         self.ro_attrs=AttributeGroup('Readonly variables (for pythonichue object reference, do not edit)')
         self.resolve_hue_id_fields=[]
@@ -221,10 +238,10 @@ class GeneralHueObject:
                     #raise NotImplementedError('Dict reference generation not supported')
         s=['bridge.add_%s(%s(' % (objtype, self.__class__.__name__)]
         s+=prefix
-        s.append('\t## Read-write attributes')
-        s+=['\t{0}={1!r},'.format(k, v) for k, v in self.kwargs.items()]
-        s.append('\t## Read-only attributes')
-        s+=['\t{0}={1!r},'.format(k, v) for k, v in self.rokwargs.items()]
+        #s.append('\t## Read-write attributes')
+        #s+=['\t{0}={1!r},'.format(k, v) for k, v in self.kwargs.items()]
+        #s.append('\t## Read-only attributes')
+        #s+=['\t{0}={1!r},'.format(k, v) for k, v in self.rokwargs.items()]
         if hasattr(self, 'rw_attrs'):
             s+=self.rw_attrs.to_python()
         if hasattr(self, 'ro_attrs'):
@@ -238,5 +255,5 @@ class GeneralHueObject:
         else:
             raise ValueError('object "%s" has no name' % self.__class__.__name__)
     def __repr__(self):
-        return '<%s "%s">' % (self.__class__.__name__, self.kwargs['name'])
+        return '<%s #%s "%s">' % (self.__class__.__name__, self.hue_id, self.kwargs['name'])
 
